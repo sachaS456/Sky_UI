@@ -22,6 +22,7 @@ namespace Sky_framework
         private bool LoadWindow = true;
         private Color BorderColor_ = Color.FromArgb(64, 64, 64);
         private Color TextColor_ = Color.FromArgb(224, 224, 224);
+        private bool ButtonMaximizedVisible_ = true;
 
         public sbyte Border { get; set; } = 3;
         public bool Redimensionnable { get; set; } = true;
@@ -299,7 +300,7 @@ namespace Sky_framework
                 {
                     this.WindowState = FormWindowState.Normal;
                     ButtonClose.Visible = true;
-                    ButtonMaximized.Visible = true;
+                    ButtonMaximized.Visible = ButtonMaximizedVisible_;
                     ButtonMinimized.Visible = true;
                 }
             }
@@ -346,6 +347,7 @@ namespace Sky_framework
             set
             {
                 ButtonMaximized.Visible = value;
+                ButtonMaximizedVisible_ = value;
             }
         }
 

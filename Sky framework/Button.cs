@@ -89,7 +89,7 @@ namespace Sky_framework
 
         private void WriteText()
         {
-            if (this.Text == string.Empty || this.Text == null)
+            if (this == null || this.IsDisposed == true || this.Disposing == true || this.Text == string.Empty || this.Text == null || this.CreateGraphics() == null)
             {
                 return;
             }
@@ -724,6 +724,11 @@ namespace Sky_framework
 
         private void DrawImage()
         {
+            if (this.CreateGraphics() == null)
+            {
+                return;
+            }
+            
             if (Image_ == null)
             {
                 this.CreateGraphics().Clear(base.BackColor);
