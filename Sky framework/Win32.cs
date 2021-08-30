@@ -27,6 +27,12 @@ namespace Sky_framework
         [DllImport("user32.dll")]
         public static extern int SystemParametersInfo(int uiAction, int uiParam, string pvParam, int fWinIni);
 
+        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
+        public extern static void ReleaseCapture();
+
+        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
+        public extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
+
         // ReSharper disable InconsistentNaming, UnusedMember.Local, NotAccessedField.Local
 #pragma warning disable 649
 

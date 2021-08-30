@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace Sky_framework
 {
@@ -18,42 +19,26 @@ namespace Sky_framework
         private ButtonCircular ButtonClose = new ButtonCircular();
         private ButtonCircular ButtonMaximized = new ButtonCircular();
         private ButtonCircular ButtonMinimized = new ButtonCircular();
-        private bool DrawWindow = true;
-        private bool LoadWindow = true;
         private Color BorderColor_ = Color.FromArgb(64, 64, 64);
         private Color TextColor_ = Color.FromArgb(224, 224, 224);
+        private bool ButtonMaximizedVisible_ = true;
 
         public sbyte Border { get; set; } = 3;
         public bool Redimensionnable { get; set; } = true;
 
         public SkyForms() : base()
         {
-            this.FormBorderStyle = FormBorderStyle.None;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
             this.MinimumSize = new Size(200, 100);
-            this.SetStyle(ControlStyles.ResizeRedraw, true);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.Resize += new EventHandler(this_Resize);
-            this.BackColorChanged += new EventHandler(this_ColorChanged);
-            this.Move += new EventHandler(this_Moved);
             this.Text = "Sky Form";
-
-            /*label.Location = new Point(38, 0);
-            label.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            label.AutoSize = true;
-            label.Text = "Sky form";
-            label.BackColor = Color.Transparent;
-            label.ForeColor = Color.FromArgb(224, 224, 224);
-            label.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
-            label.MouseEnter += new EventHandler(TitleBarObjects_MouseDown);
-            label.MouseLeave += new EventHandler(TitleBarObjects_MouseUp);
-            this.Controls.Add(label);*/
 
             ButtonClose.Size = 20;
             ButtonClose.BackColor = Color.FromArgb(245, 90, 90);
             ButtonClose.Anchor = AnchorStyles.Right | AnchorStyles.Top;
-            ButtonClose.Location = new Point(this.Width - 26, 1);
+            ButtonClose.Location = new Point(this.Width - 36, 1);
             ButtonClose.Text = "x";
-            ButtonMinimized.ForeColor = Color.FromArgb(224, 224, 224);
+            ButtonClose.ForeColor = Color.FromArgb(224, 224, 224);
             ButtonClose.TextAlign = ContentAlignment.MiddleCenter;
             ButtonClose.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point);
             ButtonClose.MouseClick += new MouseEventHandler(ButtonCloseClique);
@@ -62,7 +47,7 @@ namespace Sky_framework
             ButtonMaximized.Size = 20;
             ButtonMaximized.BackColor = Color.FromArgb(245, 90, 90);
             ButtonMaximized.Anchor = AnchorStyles.Right | AnchorStyles.Top;
-            ButtonMaximized.Location = new Point(this.Width - 52, 1);
+            ButtonMaximized.Location = new Point(this.Width - 62, 1);
             ButtonMaximized.Text = "o";
             ButtonMinimized.ForeColor = Color.FromArgb(224, 224, 224);
             ButtonMaximized.TextAlign = ContentAlignment.MiddleCenter;
@@ -73,7 +58,7 @@ namespace Sky_framework
             ButtonMinimized.Size = 20;
             ButtonMinimized.BackColor = Color.FromArgb(245, 90, 90);
             ButtonMinimized.Anchor = AnchorStyles.Right | AnchorStyles.Top;
-            ButtonMinimized.Location = new Point(this.Width - 78, 1);
+            ButtonMinimized.Location = new Point(this.Width - 88, 1);
             ButtonMinimized.Text = "-";
             ButtonMinimized.ForeColor = Color.FromArgb(224, 224, 224);
             ButtonMinimized.TextAlign = ContentAlignment.MiddleCenter;
@@ -81,25 +66,18 @@ namespace Sky_framework
             ButtonMinimized.MouseClick += new MouseEventHandler(ButtonMinimizedClique);
             this.Controls.Add(ButtonMinimized);
 
-            /*PictureBox.Location = new Point(10, 2);
-            PictureBox.Size = new Size(16, 16);
-            PictureBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            PictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-            PictureBox.BackColor = Color.Transparent;
-            this.Controls.Add(PictureBox);*/
-
-            this.FormClosing += new FormClosingEventHandler(animationCloseForm);           
+            this.FormClosing += new FormClosingEventHandler(animationCloseForm);
+            //this.MouseDown += new MouseEventHandler(This_MouseDown);
+            //this.MaximumSize = Screen.FromHandle(Handle).Bounds.Size;
+            this.SetStyle(ControlStyles.ResizeRedraw, true);
+            this.SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            this.UpdateStyles();
         }
 
-        private void this_Moved(object sender, EventArgs e)
+        /*private void This_MouseDown(object sender, MouseEventArgs e)
         {
-            DrawWindow = true;
-        }
 
-        private void this_ColorChanged(object sender, EventArgs e)
-        {
-            DrawWindow = true;
-        }
+        }*/
 
         private void ButtonCloseClique(object sender, MouseEventArgs e)
         {
@@ -136,27 +114,26 @@ namespace Sky_framework
             while (this.Opacity <= 0.99)
             {
                 this.Opacity += 0.05;
-                System.Threading.Thread.Sleep(10);
+                System.Threading.Thread.Sleep(1000 / 60);
             }
 
-            LoadWindow = false;
             this.Visible = false;
             return base.ShowDialog();
         }
 
         new public async void Show()
         {
-            base.Show();
+            //base.Show();
             this.Opacity = 0;
+            this.Visible = true;
 
             while (this.Opacity <= 0.99)
             {
                 this.Opacity += 0.05;
-                await Task.Delay(10);
+                await Task.Delay(1000 / 60);
             }
 
             this.Opacity = 1;
-            LoadWindow = false;
         }
 
         public void Close(bool ClearMemory)
@@ -164,7 +141,7 @@ namespace Sky_framework
             while (this.Opacity >= 0.01)
             {
                 this.Opacity -= 0.05;
-                System.Threading.Thread.Sleep(10);
+                System.Threading.Thread.Sleep(1000/60);
             }
 
             if (ClearMemory == true)
@@ -178,12 +155,6 @@ namespace Sky_framework
             Close(true);
         }
 
-        new public void Update()
-        {
-            DrawWindow = true;
-            base.Update();
-        }
-
         new public string Text
         {
             get
@@ -193,10 +164,7 @@ namespace Sky_framework
             set
             {
                 base.Text = value;
-                System.Drawing.Rectangle rc = new System.Drawing.Rectangle(0, 0, this.ClientSize.Width, 20);
-                this.CreateGraphics().FillRectangle(new SolidBrush(BorderColor_), rc);
-                this.CreateGraphics().DrawString(this.Text, new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point), new SolidBrush(TextColor_), new Point(38, 0));
-                this.CreateGraphics().DrawIcon(base.Icon, new System.Drawing.Rectangle(10, 2, 16, 16));
+                this.Refresh();
             }
         }
 
@@ -209,7 +177,7 @@ namespace Sky_framework
             set
             {
                 TextColor_ = value;
-                this.Update();
+                this.Refresh();
             }
         }
 
@@ -222,9 +190,6 @@ namespace Sky_framework
             set
             {
                 BorderColor_ = value;
-                //DrawWindow = true;
-                //label.BackColor = this.BorderColor;
-                //PictureBox.BackColor = this.BorderColor;
 
                 if (this.BorderColor.R + 40 > 255)
                 {
@@ -247,7 +212,7 @@ namespace Sky_framework
                     ButtonMinimized.BackColor = Color.FromArgb(this.BorderColor.R + 40, this.BorderColor.G + 40, this.BorderColor.B + 40);
                 }
 
-                this.Update();
+                this.Refresh();
             }
         }
 
@@ -271,9 +236,8 @@ namespace Sky_framework
             }
             set
             {
-                //PictureBox.Image = value.ToBitmap();
                 base.Icon = value;
-                this.Update();
+                this.Refresh();
             }
         }
 
@@ -290,6 +254,7 @@ namespace Sky_framework
                 if (value == true)
                 {
                     this.WindowState = FormWindowState.Normal;
+                    this.FormBorderStyle = FormBorderStyle.None;
                     this.WindowState = FormWindowState.Maximized;
                     ButtonClose.Visible = false;
                     ButtonMaximized.Visible = false;
@@ -297,11 +262,14 @@ namespace Sky_framework
                 }
                 else
                 {
+                    this.FormBorderStyle = FormBorderStyle.Sizable;
                     this.WindowState = FormWindowState.Normal;
                     ButtonClose.Visible = true;
-                    ButtonMaximized.Visible = true;
+                    ButtonMaximized.Visible = ButtonMaximizedVisible_;
                     ButtonMinimized.Visible = true;
                 }
+
+                this.Refresh();
             }
         }
 
@@ -315,9 +283,9 @@ namespace Sky_framework
             {
                 base.Size = value;
 
-                ButtonClose.Location = new Point(this.Width - 26, ButtonClose.Location.Y);
-                ButtonMaximized.Location = new Point(this.Width - 52, ButtonMaximized.Location.Y);
-                ButtonMinimized.Location = new Point(this.Width - 78, ButtonMinimized.Location.Y);
+                ButtonClose.Location = new Point(this.Width - 36, ButtonClose.Location.Y);
+                ButtonMaximized.Location = new Point(this.Width - 62, ButtonMaximized.Location.Y);
+                ButtonMinimized.Location = new Point(this.Width - 88, ButtonMinimized.Location.Y);
             }
         }
 
@@ -331,9 +299,9 @@ namespace Sky_framework
             {
                 base.ClientSize = value;
 
-                ButtonClose.Location = new Point(this.Width - 26, ButtonClose.Location.Y);
-                ButtonMaximized.Location = new Point(this.Width - 52, ButtonMaximized.Location.Y);
-                ButtonMinimized.Location = new Point(this.Width - 78, ButtonMinimized.Location.Y);
+                ButtonClose.Location = new Point(this.Width - 36, ButtonClose.Location.Y);
+                ButtonMaximized.Location = new Point(this.Width - 62, ButtonMaximized.Location.Y);
+                ButtonMinimized.Location = new Point(this.Width - 88, ButtonMinimized.Location.Y);
             }
         }
 
@@ -346,76 +314,53 @@ namespace Sky_framework
             set
             {
                 ButtonMaximized.Visible = value;
+                ButtonMaximizedVisible_ = value;
             }
         }
 
-        private void this_Resize(object sender, EventArgs e)
+        /*protected override void OnResizeBegin(EventArgs e)
         {
-            DrawWindow = true;
+            SuspendLayout();
+            base.OnResizeBegin(e);
         }
+        protected override void OnResizeEnd(EventArgs e)
+        {
+            ResumeLayout();
+            base.OnResizeEnd(e);
+        }*/
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            if (DrawWindow == true || LoadWindow == true)
+            if (FullSreen_ == false)
             {
-                if (FullSreen_ == false)
+                Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor_, Border), 0, 0, Width - 2, Height - 2, 2, e.Graphics);
+
+                System.Drawing.Rectangle rc = new System.Drawing.Rectangle(0, 0, this.ClientSize.Width, 20);
+                e.Graphics.FillRectangle(new SolidBrush(BorderColor_), rc);
+                e.Graphics.DrawString(this.Text, new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point), new SolidBrush(TextColor_), new Point(38, 0));
+                e.Graphics.DrawIcon(base.Icon, new System.Drawing.Rectangle(10, 2, 16, 16));
+
+                /*IntPtr handle = Win32.CreateRoundRectRgn(0, 0, Width, Height, 15, 15);
+
+                if (handle != IntPtr.Zero)
                 {
-                    IntPtr handle = Win32.CreateRoundRectRgn(0, 0, Width, Height, 15, 15);
+                    //Region = Region.FromHrgn(handle);
+                    Win32.DeleteObject(handle);
+                }*/
+            }
+            else
+            {
+                /*IntPtr handle = Win32.CreateRoundRectRgn(0, 0, Width + 1, Height + 1, 0, 0);
 
-                    if (handle != IntPtr.Zero)
-                    {
-                        Region = Region.FromHrgn(handle);
-                        Win32.DeleteObject(handle);
-                    }
-
-                    //ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, BorderColor_, Border, ButtonBorderStyle.Solid, BorderColor_, Border, ButtonBorderStyle.Solid,
-                    //BorderColor_, Border, ButtonBorderStyle.Solid, BorderColor_, Border, ButtonBorderStyle.Solid);
-                    Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor_, Border), 0, 0, Width - 2, Height - 2, 5, this.CreateGraphics());
-
-                    System.Drawing.Rectangle rc = new System.Drawing.Rectangle(0, 0, this.ClientSize.Width, 20);
-                    e.Graphics.FillRectangle(new SolidBrush(BorderColor_), rc);
-
-                    e.Graphics.DrawString(this.Text, new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point), new SolidBrush(TextColor_), new Point(38, 0));
-                    e.Graphics.DrawIcon(base.Icon, new System.Drawing.Rectangle(10, 2, 16, 16));
-
-                    /*if (this.Icon != null && PictureBox != null && this.Icon.ToBitmap() != PictureBox.Image)
-                    {
-                        PictureBox.Image = this.Icon.ToBitmap();
-                        PictureBox.Image.Dispose();
-                        PictureBox.Image = this.Icon.ToBitmap();
-                    }*/
-                }
-                else
+                if (handle != IntPtr.Zero)
                 {
-                    IntPtr handle = Win32.CreateRoundRectRgn(0, 0, Width + 1, Height + 1, 0, 0);
+                    //Region = Region.FromHrgn(handle);
+                    Win32.DeleteObject(handle);
+                }*/
 
-                    if (handle != IntPtr.Zero)
-                    {
-                        Region = Region.FromHrgn(handle);
-                        Win32.DeleteObject(handle);
-                    }
-
-                    //ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, BorderColor_, 0, ButtonBorderStyle.None, BorderColor_, 0, ButtonBorderStyle.None,
-                    //BorderColor_, 0, ButtonBorderStyle.None, BorderColor_, 0, ButtonBorderStyle.None);
-                    Sky_framework.Border.DrawRoundRectangle(new Pen(this.BackColor, Border), 0, 0, Width - 2, Height - 2, 5, this.CreateGraphics());
-                }
-
-                DrawWindow = false;
+                //Sky_framework.Border.DrawRoundRectangle(new Pen(this.BackColor, Border), 0, 0, Width - 2, Height - 2, 5, e.Graphics);
             }
         }
-
-        //set MinimumSize to Form
-        /*public override Size MinimumSize
-        {
-            get
-            {
-                return base.MinimumSize;
-            }
-            set
-            {
-                base.MinimumSize = new Size(179, 51);
-            }
-        }*/
 
         //
         //override  WndProc  
@@ -454,7 +399,30 @@ namespace Sky_framework
                 }
             }
 
+            //Remove border and keep snap window
+            if (m.Msg == 0x0083 && m.WParam.ToInt32() == 1 && FullSreen_ == false)
+            {
+                return;
+            }
+
+            /*const int WM_NCCALCSIZE = 0x83;
+            if (m.Msg == WM_NCCALCSIZE && m.WParam.ToInt32() == 1)
+            {
+                m.Result = new IntPtr(0xF0);   // Align client area to all borders
+                return;
+            }*/
+
             base.WndProc(ref m);
         }
+
+        /*protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.Style |= 0x20000 | 0x80000 | 0x40000; //WS_MINIMIZEBOX | WS_SYSMENU | WS_SIZEBOX;
+                return cp;
+            }
+        }*/
     }
 }

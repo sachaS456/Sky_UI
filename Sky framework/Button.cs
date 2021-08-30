@@ -16,15 +16,16 @@ namespace Sky_framework
         private int borderRadius_ = 0;
         private Image Image_ = null;
         private ContentAlignment ImageAlign_ = ContentAlignment.MiddleCenter;
-
-        public Color BorderColor { get; set; } = Color.FromArgb(224, 224, 224);
+        private int BorderSize_ = 0;
+        private Color BorderColor_ = Color.FromArgb(224, 224, 224);
+       
         public MouseEventNameHandler MouseClickNameString = null;
         public int ID { get; set; } = 0;
 
         public Button()
         {
             this.BackColor = Color.FromArgb(64, 64, 64);
-            WriteText();
+            WriteText(CreateGraphics());
 
             this.Resize += new EventHandler(Button_Resize);
             this.MouseEnter += new EventHandler(Button_MouseEnter);
@@ -34,6 +35,9 @@ namespace Sky_framework
             this.MouseClick += new MouseEventHandler(Button_MouseClick);
 
             Color = this.BackColor;
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.DoubleBuffer, true);
+            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            UpdateStyles();
         }
 
         private void Button_MouseClick(object sender, MouseEventArgs e)
@@ -46,7 +50,7 @@ namespace Sky_framework
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            WriteText(); // Peut causer une haute utilisation de la mémoire et du processeur
+            DrawBorder(e.Graphics);
         }
 
         private void Button_Resize(object sender, EventArgs e)
@@ -59,12 +63,12 @@ namespace Sky_framework
                 Win32.DeleteObject(handle);
             }
 
-            if (Border == true)
+            /*if (Border == true)
             {
-                ControlPaint.DrawBorder(CreateGraphics(), new System.Drawing.Rectangle(0, 0, this.Width, this.Height), BorderColor, ButtonBorderStyle.Solid);
-            }
+                ControlPaint.DrawBorder(CreateGraphics(), new System.Drawing.Rectangle(0, 0, this.Width, this.Height), BorderColor_, ButtonBorderStyle.Solid);
+            }*/
 
-            WriteText();
+            DrawBorder(CreateGraphics());
         }
 
         public int borderRadius
@@ -87,33 +91,33 @@ namespace Sky_framework
             }
         }
 
-        private void WriteText()
+        private void WriteText(Graphics g)
         {
-            if (this.Text == string.Empty || this.Text == null)
+            if (this == null || this.IsDisposed == true || this.Disposing == true || this.Text == string.Empty || this.Text == null || g == null)
             {
                 return;
             }
 
-            SizeF sizeText = this.CreateGraphics().MeasureString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold));
-            this.CreateGraphics().Clear(base.BackColor);
+            SizeF sizeText = g.MeasureString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold));
+            g.Clear(base.BackColor);
 
             if (Image_ != null)
             {
-                DrawImage();
+                DrawImage(g);
             }
 
             switch (TextAling_)
             {
                 case ContentAlignment.MiddleLeft:
-                    this.CreateGraphics().DrawString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold), new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(5, this.Height / 2 - (int)sizeText.Height / 2));
+                    g.DrawString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold), new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(5, this.Height / 2 - (int)sizeText.Height / 2));
                     break;
 
                 case ContentAlignment.MiddleCenter:
-                    this.CreateGraphics().DrawString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold), new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(this.Width / 2 - (int)sizeText.Width / 2, this.Height / 2 - (int)sizeText.Height / 2));
+                    g.DrawString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold), new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(this.Width / 2 - (int)sizeText.Width / 2, this.Height / 2 - (int)sizeText.Height / 2));
                     break;
 
                 case ContentAlignment.MiddleRight:
-                    this.CreateGraphics().DrawString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold), new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(this.Width - (int)sizeText.Width, this.Height / 2 - (int)sizeText.Height / 2));
+                    g.DrawString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold), new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(this.Width - (int)sizeText.Width, this.Height / 2 - (int)sizeText.Height / 2));
                     break;
             }
 
@@ -618,6 +622,53 @@ namespace Sky_framework
             }
         }
 
+        private void DrawBorder(Graphics g)
+        {
+            if (this == null || this.IsDisposed == true || this.Disposing == true || g == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(Text) == false)
+            {
+                WriteText(g);
+            }
+
+            if (Border == true)
+            {
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor_, BorderSize_), 0, 0, Width - BorderSize_, Height - BorderSize_, borderRadius - 7, g);
+            }
+        }
+
+        public int BorderSize
+        {
+            get
+            {
+                return BorderSize_;
+            }
+            set
+            {
+                BorderSize_ = value;
+
+                DrawBorder(CreateGraphics());
+            }
+        }
+
+        public Color BorderColor
+        {
+            get
+            {
+                return BorderColor_;
+            }
+            set
+            {
+                BorderColor_ = value;
+
+                DrawBorder(CreateGraphics());
+            }
+        }
+
         public bool Border
         {
             get
@@ -628,16 +679,8 @@ namespace Sky_framework
             {
                 Border_ = value;
 
-                if (value == true)
-                {
-                    ControlPaint.DrawBorder(CreateGraphics(), new System.Drawing.Rectangle(0, 0, this.Width, this.Height), BorderColor, ButtonBorderStyle.Solid);
-                }
-                else
-                {
-                    CreateGraphics().Clear(base.BackColor);
-                    this.BackgroundImage = BackgroundImage;
-                }
-            }
+                DrawBorder(CreateGraphics());
+            }            
         }
 
         new public Color BackColor
@@ -653,7 +696,7 @@ namespace Sky_framework
 
                 if (Border == true)
                 {
-                    ControlPaint.DrawBorder(CreateGraphics(), new System.Drawing.Rectangle(0, 0, this.Width, this.Height), BorderColor, ButtonBorderStyle.Solid);
+                    ControlPaint.DrawBorder(CreateGraphics(), new System.Drawing.Rectangle(0, 0, this.Width, this.Height), BorderColor_, ButtonBorderStyle.Solid);
                 }
             }
         }
@@ -679,7 +722,7 @@ namespace Sky_framework
             set
             {
                 TextAling_ = value;
-                WriteText();
+                WriteText(CreateGraphics());
             }
         }
 
@@ -692,7 +735,7 @@ namespace Sky_framework
             set
             {
                 base.Text = value;
-                WriteText();
+                WriteText(CreateGraphics());
             }
         }
 
@@ -705,7 +748,7 @@ namespace Sky_framework
             set
             {
                 ImageAlign_ = value;
-                DrawImage();
+                DrawImage(CreateGraphics());
             }
         }
 
@@ -718,31 +761,36 @@ namespace Sky_framework
             set
             {
                 Image_ = value;
-                DrawImage();
+                DrawImage(CreateGraphics());
             }
         }
 
-        private void DrawImage()
+        private void DrawImage(Graphics g)
         {
+            if (g == null)
+            {
+                return;
+            }
+            
             if (Image_ == null)
             {
-                this.CreateGraphics().Clear(base.BackColor);
-                WriteText();
+                g.Clear(base.BackColor);
+                WriteText(g);
                 return;
             }
 
             switch (ImageAlign_)
             {
                 case ContentAlignment.MiddleLeft:
-                    this.CreateGraphics().DrawImage(Image_, new Point(5, this.Height / 2 - Image_.Height / 2));
+                    g.DrawImage(Image_, new Point(5, this.Height / 2 - Image_.Height / 2));
                     break;
 
                 case ContentAlignment.MiddleCenter:
-                    this.CreateGraphics().DrawImage(Image_, new Point(this.Width / 2 - Image_.Width / 2, this.Height / 2 - Image_.Height / 2));
+                    g.DrawImage(Image_, new Point(this.Width / 2 - Image_.Width / 2, this.Height / 2 - Image_.Height / 2));
                     break;
 
                 case ContentAlignment.MiddleRight:
-                    this.CreateGraphics().DrawImage(Image_, new Point(this.Width - Image_.Width, this.Height / 2 - Image_.Height / 2));
+                    g.DrawImage(Image_, new Point(this.Width - Image_.Width, this.Height / 2 - Image_.Height / 2));
                     break;
             }
         }

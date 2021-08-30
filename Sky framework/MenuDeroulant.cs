@@ -20,6 +20,7 @@ namespace Sky_framework
         private int nbBar = 0;
         private double TwoColumn = 1;
         private byte lang;
+        private int SizeNBButton = 0;
 
         public Color BorderColor { get; set; } = Color.FromArgb(224, 224, 224);
         public int Border { get; set; } = 0;
@@ -32,6 +33,9 @@ namespace Sky_framework
             this.Visible = false;
             this.Resize += new EventHandler(This_Resize);
             this.lang = lang;
+
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            UpdateStyles();
         }
 
         public MenuDeroulant()
@@ -41,10 +45,18 @@ namespace Sky_framework
             this.Visible = false;
             this.Resize += new EventHandler(This_Resize);
             this.lang = 1;
+
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            UpdateStyles();
         }
 
         private void This_Resize(object sender, EventArgs e)
         {
+            if (this == null || this.IsDisposed == true || this.Disposing == true)
+            {
+                return;
+            }
+
             IntPtr handle = Win32.CreateRoundRectRgn(0, 0, Width, Height, BorderRadius_, BorderRadius_);
 
             if (handle != IntPtr.Zero)
@@ -63,6 +75,14 @@ namespace Sky_framework
             }
             //ControlPaint.DrawBorder(CreateGraphics(), this.ClientRectangle, BorderColor, Border, ButtonBorderStyle.Solid, BorderColor, Border, ButtonBorderStyle.Solid,
             //BorderColor, Border, ButtonBorderStyle.Solid, BorderColor, Border, ButtonBorderStyle.Solid);
+        }
+
+        public int NbButton
+        {
+            get
+            {
+                return buttons.Count();
+            }
         }
 
         public void AddButton(string[] buttonList)
@@ -274,7 +294,12 @@ namespace Sky_framework
             nbBar++;
         }
 
-        public async void NewPage(string[] buttonList, MouseEventHandler[] e)
+        public void NewPage(string[] buttonList, MouseEventHandler e, bool TwoColumns = false)
+        {
+            NewPage(buttonList, new MouseEventHandler[1] { e }, TwoColumns);
+        }
+
+        public async void NewPage(string[] buttonList, MouseEventHandler[] e, bool TwoColumns = false)
         {
             for (int index = 0; index < ButtonsPage.Count(); index++)
             {
@@ -283,26 +308,78 @@ namespace Sky_framework
 
             ButtonsPage.Clear();
 
-            for (int index = 0; index < buttonList.Count(); index++)
+            if (TwoColumns == false)
             {
-                ButtonsPage.Add(new Button());
-                ButtonsPage[index].Text = buttonList[index];
-                ButtonsPage[index].ID = index;
-                ButtonsPage[index].Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-                ButtonsPage[index].TextAlign = ContentAlignment.MiddleLeft;
-                ButtonsPage[index].Size = new Size(SizeWidth - Border * 2, HeightButton);
-                ButtonsPage[index].MouseClick += e[index];
-
-                if (index == 0)
+                for (int index = 0; index < buttonList.Count(); index++)
                 {
-                    ButtonsPage[index].Location = new Point(-(SizeWidth - Border * 2), HeightButton + Border);
-                }
-                else
-                {
-                    ButtonsPage[index].Location = new Point(-(SizeWidth - Border * 2), ButtonsPage[index - 1].Location.Y + HeightButton);
-                }
+                    ButtonsPage.Add(new Button());
+                    ButtonsPage[index].Text = buttonList[index];
+                    ButtonsPage[index].ID = index;
+                    ButtonsPage[index].Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+                    ButtonsPage[index].TextAlign = ContentAlignment.MiddleLeft;
+                    ButtonsPage[index].Size = new Size(SizeWidth - Border * 2, HeightButton);
+                    if (e.Count() == 1)
+                    {
+                        ButtonsPage[index].MouseClick += e[0];
+                    }
+                    else
+                    {
+                        ButtonsPage[index].MouseClick += e[index];
+                    }
 
-                this.Controls.Add(ButtonsPage[index]);
+                    if (index == 0)
+                    {
+                        ButtonsPage[index].Location = new Point(-(SizeWidth - Border * 2), HeightButton + Border);
+                    }
+                    else
+                    {
+                        ButtonsPage[index].Location = new Point(-(SizeWidth - Border * 2), ButtonsPage[index - 1].Location.Y + HeightButton);
+                    }
+
+                    this.Controls.Add(ButtonsPage[index]);
+                }
+            }
+            else
+            {
+                for (int index = 0; index < buttonList.Count(); index++)
+                {
+                    ButtonsPage.Add(new Button());
+                    ButtonsPage[index].Text = buttonList[index];
+                    ButtonsPage[index].ID = index;
+                    ButtonsPage[index].Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+                    ButtonsPage[index].TextAlign = ContentAlignment.MiddleLeft;
+                    ButtonsPage[index].Size = new Size((SizeWidth - Border * 2) / 2, HeightButton);
+                    if (e.Count() == 1)
+                    {
+                        ButtonsPage[index].MouseClick += e[0];
+                    }
+                    else
+                    {
+                        ButtonsPage[index].MouseClick += e[index];
+                    }
+
+                    if (index == 0)
+                    {
+                        buttons[index].Location = new Point(-(SizeWidth - Border * 2), HeightButton + Border);
+                    }
+                    else
+                    {
+                        if (index == buttonList.Count() / 2)
+                        {
+                            buttons[index].Location = new Point(-(SizeWidth - Border * 2) + this.Width / 2, HeightButton + Border);
+                        }
+                        else if (index > buttonList.Count() / 2)
+                        {
+                            buttons[index].Location = new Point(-(SizeWidth - Border * 2) + this.Width / 2, ButtonsPage[index - 1].Location.Y + HeightButton);
+                        }
+                        else
+                        {
+                            buttons[index].Location = new Point(-(SizeWidth - Border * 2), ButtonsPage[index - 1].Location.Y + HeightButton);
+                        }
+                    }
+
+                    this.Controls.Add(ButtonsPage[index]);
+                }
             }
 
             Button buttonRetour = new Button();
@@ -322,6 +399,8 @@ namespace Sky_framework
             buttonRetour.MouseClick += new MouseEventHandler(MainPage);
             this.Controls.Add(buttonRetour);
 
+            UpdateSizeNewPage(TwoColumns);
+
             for (int index = -(SizeWidth - Border * 2); index < 0; index += 10)
             {
                 for (int index2 = 0; index2 < this.Controls.Count; index2++)
@@ -333,8 +412,339 @@ namespace Sky_framework
             }
         }
 
+        public void NewPage(string[] buttonList, MouseEventNameHandler e, bool TwoColumns = false)
+        {
+             NewPage(buttonList, new MouseEventNameHandler[1] { e }, TwoColumns);
+        }
+
+        public async void NewPage(string[] buttonList, MouseEventNameHandler[] e, bool TwoColumns = false)
+        {
+            for (int index = 0; index < ButtonsPage.Count(); index++)
+            {
+                this.Controls.Remove(ButtonsPage[index]);
+            }
+
+            ButtonsPage.Clear();
+
+            if (TwoColumns == false)
+            {
+                for (int index = 0; index < buttonList.Count(); index++)
+                {
+                    ButtonsPage.Add(new Button());
+                    ButtonsPage[index].Text = buttonList[index];
+                    ButtonsPage[index].ID = index;
+                    ButtonsPage[index].Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+                    ButtonsPage[index].TextAlign = ContentAlignment.MiddleLeft;
+                    ButtonsPage[index].Size = new Size(SizeWidth - Border * 2, HeightButton);
+                    if (e.Count() == 1)
+                    {
+                        ButtonsPage[index].MouseClickNameString += e[0];
+                    }
+                    else
+                    {
+                        ButtonsPage[index].MouseClickNameString += e[index];
+                    }
+
+                    if (index == 0)
+                    {
+                        ButtonsPage[index].Location = new Point(-(SizeWidth - Border * 2), HeightButton + Border);
+                    }
+                    else
+                    {
+                        ButtonsPage[index].Location = new Point(-(SizeWidth - Border * 2), ButtonsPage[index - 1].Location.Y + HeightButton);
+                    }
+
+                    this.Controls.Add(ButtonsPage[index]);
+                }
+            }
+            else
+            {
+                for (int index = 0; index < buttonList.Count(); index++)
+                {
+                    ButtonsPage.Add(new Button());
+                    ButtonsPage[index].Text = buttonList[index];
+                    ButtonsPage[index].ID = index;
+                    ButtonsPage[index].Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+                    ButtonsPage[index].TextAlign = ContentAlignment.MiddleLeft;
+                    ButtonsPage[index].Size = new Size((SizeWidth - Border * 2) / 2, HeightButton);
+                    if (e.Count() == 1)
+                    {
+                        ButtonsPage[index].MouseClickNameString += e[0];
+                    }
+                    else
+                    {
+                        ButtonsPage[index].MouseClickNameString += e[index];
+                    }
+
+                    if (index == 0)
+                    {
+                        ButtonsPage[index].Location = new Point(-(SizeWidth - Border * 2), HeightButton + Border);
+                    }
+                    else
+                    {
+                        if (index == buttonList.Count() / 2)
+                        {
+                            ButtonsPage[index].Location = new Point(-(SizeWidth - Border * 2) + this.Width / 2, HeightButton + Border);
+                        }
+                        else if (index > buttonList.Count() / 2)
+                        {
+                            ButtonsPage[index].Location = new Point(-(SizeWidth - Border * 2) + this.Width / 2, ButtonsPage[index - 1].Location.Y + HeightButton);
+                        }
+                        else
+                        {
+                            ButtonsPage[index].Location = new Point(-(SizeWidth - Border * 2), ButtonsPage[index - 1].Location.Y + HeightButton);
+                        }
+                    }
+
+                    this.Controls.Add(ButtonsPage[index]);
+                }
+            }
+
+            Button buttonRetour = new Button();
+            if (lang == 0) // if french
+            {
+                buttonRetour.Text = "Retour"; // french
+            }
+            else
+            {
+                buttonRetour.Text = "Back"; // english
+            }
+            buttonRetour.ID = -1;
+            buttonRetour.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            buttonRetour.TextAlign = ContentAlignment.MiddleLeft;
+            buttonRetour.Size = new Size(SizeWidth - Border * 2, HeightButton);
+            buttonRetour.Location = new Point(-(SizeWidth - Border * 2), 0 + Border);
+            buttonRetour.MouseClick += new MouseEventHandler(MainPage);
+            this.Controls.Add(buttonRetour);
+
+            UpdateSizeNewPage(TwoColumns);
+
+            for (int index = -(SizeWidth - Border * 2); index < 0; index += 10)
+            {
+                for (int index2 = 0; index2 < this.Controls.Count; index2++)
+                {
+                    this.Controls[index2].Location = new Point(this.Controls[index2].Location.X + 10, this.Controls[index2].Location.Y);
+                }
+
+                await Task.Delay(5);
+            }
+        }
+
+        private async void UpdateSizeNewPage(bool TwoColumns)
+        {
+            switch (ShowSide)
+            {
+                case Side.Top:
+                    if (TwoColumns)
+                    {
+                        for (int index = 0; index < HeightButton * arrondissement(ButtonsPage.Count() / 2 - buttons.Count() / 2, TwoColumn) - 15; index += 15)
+                        {
+                            this.Size = new Size(this.Width, this.Height + 15);
+                            await Task.Delay(5);
+                        }
+                    }
+                    else
+                    {
+                        for (int index = 0; index < HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn); index += 15)
+                        {
+                            this.Size = new Size(this.Width, this.Height + 15);
+                            await Task.Delay(5);
+                        }
+                    }
+                    break;
+
+                case Side.Bottom:
+                    if (TwoColumns)
+                    {
+                        for (int index = 0; index < HeightButton * arrondissement(ButtonsPage.Count() / 2 - buttons.Count() / 2, TwoColumn) - 15;)
+                        {
+                            this.Size = new Size(this.Width, this.Height + 15);
+                            this.Location = new Point(this.Location.X, this.Location.Y - 15);
+                            index += 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    else
+                    {
+                        for (int index = 0; index < HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn);)
+                        {
+                            this.Size = new Size(this.Width, this.Height + 15);
+                            this.Location = new Point(this.Location.X, this.Location.Y - 15);
+                            index += 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    break;
+
+                case Side.Left:
+                    if (TwoColumns)
+                    {
+                        for (int index = 0; index < SizeWidth;)
+                        {
+                            this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(ButtonsPage.Count() / 2 - buttons.Count() / 2, TwoColumn) + Border + (10 * nbBar) - 15));
+                            index += 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    else
+                    {
+                        for (int index = 0; index < SizeWidth;)
+                        {
+                            this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                            index += 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    break;
+
+                case Side.Right:
+                    if (TwoColumns)
+                    {
+                        for (int index = 0; index < SizeWidth;)
+                        {
+                            this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(ButtonsPage.Count() / 2 - buttons.Count() / 2, TwoColumn) + Border + (10 * nbBar) - 15));
+                            this.Location = new Point(this.Location.X - 15, this.Location.Y);
+                            index += 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    else
+                    {
+                        for (int index = 0; index < SizeWidth;)
+                        {
+                            this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                            this.Location = new Point(this.Location.X - 15, this.Location.Y);
+                            index += 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    break;
+            }
+
+            if (Border != 0)
+            {
+                Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor, Border), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+            }
+            else
+            {
+                Sky_framework.Border.DrawRoundRectangle(new Pen(this.BackColor, 1), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+            }
+        }
+
+        private async void UpdateSizeMainPage(bool TwoColumns)
+        {
+            switch (ShowSide)
+            {
+                case Side.Top:
+                    if (TwoColumns)
+                    {
+                        for (int index = (HeightButton * arrondissement(ButtonsPage.Count() / 2 - buttons.Count() / 2, TwoColumn)) - 15; index > 0;)
+                        {
+                            this.Size = new Size(this.Width, this.Height - 15);
+                            index -= 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    else
+                    {
+                        for (int index = (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn)); index > 0;)
+                        {
+                            this.Size = new Size(this.Width, this.Height - 15);
+                            index -= 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    break;
+
+                case Side.Bottom:
+                    if (TwoColumns)
+                    {
+                        for (int index = (HeightButton * arrondissement(ButtonsPage.Count() / 2 - buttons.Count() / 2, TwoColumn)) - 15; index > 0;)
+                        {
+                            this.Size = new Size(this.Width, this.Height - 15);
+                            this.Location = new Point(this.Location.X, this.Location.Y + 15);
+                            index -= 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    else
+                    {
+                        for (int index = (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn)); index > 0;)
+                        {
+                            this.Size = new Size(this.Width, this.Height - 15);
+                            this.Location = new Point(this.Location.X, this.Location.Y + 15);
+                            index -= 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    break;
+
+                case Side.Left:
+                    if (TwoColumns)
+                    {
+                        for (int index = this.Width; index > 0;)
+                        {
+                            this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(ButtonsPage.Count() / 2 - buttons.Count() / 2, TwoColumn) + Border + (10 * nbBar)) - 15);
+                            index -= 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    else
+                    {
+                        for (int index = this.Width; index > 0;)
+                        {
+                            this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                            index -= 15;
+                            await Task.Delay(5);
+                        }
+                    }
+                    break;
+
+                case Side.Right:
+                    if (TwoColumns)
+                    {
+                        for (int index = this.Width; index > 0;)
+                        {
+                            this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(ButtonsPage.Count() / 2 - buttons.Count() / 2, TwoColumn) + Border + (10 * nbBar)) - 15);
+                            this.Location = new Point(this.Location.X + 15, this.Location.Y);
+                            index -= 15;
+                            await Task.Delay(5);
+                        };
+                    }
+                    else
+                    {
+                        for (int index = this.Width; index > 0;)
+                        {
+                            this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                            this.Location = new Point(this.Location.X + 15, this.Location.Y);
+                            index -= 15;
+                            await Task.Delay(5);
+                        };
+                    }
+                    break;
+            }
+
+            if (Border != 0)
+            {
+                Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor, Border), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+            }
+            else
+            {
+                Sky_framework.Border.DrawRoundRectangle(new Pen(this.BackColor, 1), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+            }
+        }
+
         private async void MainPage(object sender, MouseEventArgs e)
         {
+            if (ButtonsPage.Count() < this.Height)
+            {
+                UpdateSizeMainPage(true);
+            }
+            else
+            {
+                UpdateSizeMainPage(false);
+            }
+
             for (int index = SizeWidth - Border * 2; index > 0; index -= 10)
             {
                 for (int index2 = 0; index2 < this.Controls.Count; index2++)
@@ -498,7 +908,12 @@ namespace Sky_framework
             return result;
         }
 
-        new public async void Show()
+        new public void Show()
+        {
+            Show(0);
+        }
+
+        public async void Show(int SizeNBButton)
         {
             if (View == true)
             {
@@ -536,7 +951,7 @@ namespace Sky_framework
             {
                 case Side.Top:
                     this.Visible = true;
-                    for (int index = 0; index < HeightButton * arrondissement(buttons.Count(), TwoColumn); index += 15)
+                    for (int index = 0; index < HeightButton * arrondissement(buttons.Count() + SizeNBButton, TwoColumn); index += 15)
                     {
                         this.Size = new Size(this.Width, this.Height + 15);
                         await Task.Delay(5);
@@ -547,7 +962,7 @@ namespace Sky_framework
 
                 case Side.Bottom:
                     this.Visible = true;
-                    for (int index = 0; index < HeightButton * arrondissement(buttons.Count(), TwoColumn);)
+                    for (int index = 0; index < HeightButton * arrondissement(buttons.Count() + SizeNBButton, TwoColumn);)
                     {
                         this.Size = new Size(this.Width, this.Height + 15);
                         this.Location = new Point(this.Location.X, this.Location.Y - 15);
@@ -555,7 +970,7 @@ namespace Sky_framework
                         await Task.Delay(5);
                     }
                     this.Height += Border * 2 + (10 * nbBar);
-                    this.Location = new Point(this.Location.X, this.Location.Y + Border);
+                    this.Location = new Point(this.Location.X, this.Location.Y + Border + (10 * nbBar));
                     View = true;
                     break;
 
@@ -563,7 +978,7 @@ namespace Sky_framework
                     this.Visible = true;
                     for (int index = 0; index < SizeWidth;)
                     {
-                        this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                        this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(buttons.Count() + SizeNBButton, TwoColumn) + Border + (10 * nbBar)));
                         index += 15;
                         await Task.Delay(5);
                     }
@@ -574,7 +989,7 @@ namespace Sky_framework
                     this.Visible = true;
                     for (int index = 0; index < SizeWidth;)
                     {
-                        this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                        this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(buttons.Count() + SizeNBButton, TwoColumn) + Border + (10 * nbBar)));
                         this.Location = new Point(this.Location.X - 15, this.Location.Y);
                         index += 15;
                         await Task.Delay(5);
@@ -582,6 +997,8 @@ namespace Sky_framework
                     View = true;
                     break;
             }
+
+            this.SizeNBButton = SizeNBButton;
 
             //ControlPaint.DrawBorder(CreateGraphics(), this.ClientRectangle, BorderColor, Border, ButtonBorderStyle.Solid, BorderColor, Border, ButtonBorderStyle.Solid,
             //BorderColor, Border, ButtonBorderStyle.Solid, BorderColor, Border, ButtonBorderStyle.Solid);
@@ -605,7 +1022,7 @@ namespace Sky_framework
             switch (ShowSide)
             {
                 case Side.Top:
-                    for (int index = (HeightButton * arrondissement(buttons.Count(), TwoColumn)); index >= 0;)
+                    for (int index = (HeightButton * arrondissement(buttons.Count() + SizeNBButton, TwoColumn)); index >= 0;)
                     {
                         this.Size = new Size(this.Width, this.Height - 15);
                         index -= 15;
@@ -617,7 +1034,7 @@ namespace Sky_framework
                     break;
 
                 case Side.Bottom:
-                    for (int index = (HeightButton * arrondissement(buttons.Count(), TwoColumn)); index >= 0;)
+                    for (int index = (HeightButton * arrondissement(buttons.Count() + SizeNBButton, TwoColumn)); index >= 0;)
                     {
                         this.Size = new Size(this.Width, this.Height - 15);
                         this.Location = new Point(this.Location.X, this.Location.Y + 15);
@@ -625,6 +1042,7 @@ namespace Sky_framework
                         await Task.Delay(5);
                     }
                     this.Height -= Border * 2 + (10 * nbBar);
+                    this.Location = new Point(this.Location.X, this.Location.Y - Border - (10 * nbBar) - 15);
                     View = false;
                     this.Visible = false;
                     break;
@@ -632,7 +1050,7 @@ namespace Sky_framework
                 case Side.Left:
                     for (int index = this.Width; index >= 0;)
                     {
-                        this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                        this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(buttons.Count() + SizeNBButton, TwoColumn) + Border + (10 * nbBar)));
                         index -= 15;
                         await Task.Delay(5);
                     }
@@ -643,7 +1061,7 @@ namespace Sky_framework
                 case Side.Right:
                     for (int index = this.Width; index >= 0;)
                     {
-                        this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                        this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(buttons.Count() + SizeNBButton, TwoColumn) + Border + (10 * nbBar)));
                         this.Location = new Point(this.Location.X + 15, this.Location.Y);
                         index -= 15;
                         await Task.Delay(5);

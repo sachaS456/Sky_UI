@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace Sky_framework
@@ -15,6 +16,30 @@ namespace Sky_framework
             RectangleF rectangle = new RectangleF(x, y, width, height);
             System.Drawing.Drawing2D.GraphicsPath path = GetRoundedRect(rectangle, radius);
             g.DrawPath(pen, path);
+        }
+
+        public static Region ControlRadius(int Width, int Height, int radius, Graphics e)
+        {
+            e.SmoothingMode = SmoothingMode.AntiAlias;
+            GraphicsPath graphicpath = new GraphicsPath();
+            graphicpath.StartFigure();
+            graphicpath.AddArc(0, 0, radius, radius, 180, 90);
+            graphicpath.AddLine(radius, 0, Width, 0);
+
+            graphicpath.AddArc(Width - radius, 0, radius, radius, 270, 90);
+            graphicpath.AddLine(Width, radius, Width, Height - radius);
+
+            graphicpath.AddArc(Width - radius, Height - radius, radius, radius, 0, 90);
+            graphicpath.AddLine(Width, Height + radius, radius, Height);
+
+            graphicpath.AddArc(0, Height - radius, radius, radius, 90, 90);
+
+            graphicpath.CloseFigure();
+            // Draw the path to screen.
+            e.SmoothingMode = SmoothingMode.AntiAlias;
+            e.FillPath(Brushes.Transparent, graphicpath);
+
+            return new Region(graphicpath);
         }
 
         private static System.Drawing.Drawing2D.GraphicsPath GetRoundedRect(RectangleF baseRect, float radius)
