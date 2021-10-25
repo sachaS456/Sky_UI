@@ -9,8 +9,8 @@
     <Version>3.0.0</Version>
     <Authors>Sacha Himber</Authors>
     <NeutralLanguage>fr-FR</NeutralLanguage>
-    <Copyright>Copyright © Himber Sacha 2021</Copyright>
-    <Description>Composant pour les logiciels Net Core.</Description>
+    <Copyright>Copyright © 2021 Himber Sacha</Copyright>
+    <Description>Composant pour des logiciels Net.</Description>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Sky_framework_3_SH.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>

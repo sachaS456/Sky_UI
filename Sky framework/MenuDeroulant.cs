@@ -1,4 +1,22 @@
-﻿using System;
+﻿/*--------------------------------------------------------------------------------------------------------------------
+ Copyright (C) 2021 Himber Sacha
+
+ This program is free software: you can redistribute it and/or modify
+ it under the +terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 2 of the License, or
+ any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see https://www.gnu.org/licenses/gpl-2.0.html. 
+
+--------------------------------------------------------------------------------------------------------------------*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,6 +43,7 @@ namespace Sky_framework
         public Color BorderColor { get; set; } = Color.FromArgb(224, 224, 224);
         public int Border { get; set; } = 0;
         public bool View { get; private set; } = false;
+        public bool IsMainPage { get; private set; } = true;
 
         public MenuDeroulant(byte lang)
         {
@@ -85,9 +104,9 @@ namespace Sky_framework
             }
         }
 
-        public void AddButton(string[] buttonList)
+        public void SetButton(string[] buttonList)
         {
-            AddButton(ref buttonList);
+            SetButton(ref buttonList);
             SizeHeight += HeightButton;
         }
 
@@ -126,7 +145,7 @@ namespace Sky_framework
             }
         }
 
-        public void AddButton(ref string[] buttonList, bool TwoColumn = false)
+        public void SetButton(ref string[] buttonList, bool TwoColumn = false)
         {
             buttons.Clear();
             this.Controls.Clear();
@@ -198,12 +217,12 @@ namespace Sky_framework
             }
         }
 
-        public void AddButton(string[] buttonList, MouseEventNameHandler e, bool TwoColumn = false)
+        public void SetButton(string[] buttonList, MouseEventNameHandler e, bool TwoColumn = false)
         {
-            AddButton(ref buttonList, e, TwoColumn);
+            SetButton(ref buttonList, e, TwoColumn);
         }
 
-        public void AddButton(ref string[] buttonList, MouseEventNameHandler e, bool TwoColumn = false)
+        public void SetButton(ref string[] buttonList, MouseEventNameHandler e, bool TwoColumn = false)
         {
             buttons.Clear();
             this.Controls.Clear();
@@ -301,6 +320,8 @@ namespace Sky_framework
 
         public async void NewPage(string[] buttonList, MouseEventHandler[] e, bool TwoColumns = false)
         {
+            IsMainPage = false;
+
             for (int index = 0; index < ButtonsPage.Count(); index++)
             {
                 this.Controls.Remove(ButtonsPage[index]);
@@ -419,6 +440,8 @@ namespace Sky_framework
 
         public async void NewPage(string[] buttonList, MouseEventNameHandler[] e, bool TwoColumns = false)
         {
+            IsMainPage = false;
+
             for (int index = 0; index < ButtonsPage.Count(); index++)
             {
                 this.Controls.Remove(ButtonsPage[index]);
@@ -545,7 +568,7 @@ namespace Sky_framework
                     }
                     else
                     {
-                        for (int index = 0; index < HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn); index += 15)
+                        for (int index = 0; index < HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + HeightButton; index += 15)
                         {
                             this.Size = new Size(this.Width, this.Height + 15);
                             await Task.Delay(5);
@@ -566,7 +589,7 @@ namespace Sky_framework
                     }
                     else
                     {
-                        for (int index = 0; index < HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn);)
+                        for (int index = 0; index < HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + HeightButton;)
                         {
                             this.Size = new Size(this.Width, this.Height + 15);
                             this.Location = new Point(this.Location.X, this.Location.Y - 15);
@@ -590,7 +613,7 @@ namespace Sky_framework
                     {
                         for (int index = 0; index < SizeWidth;)
                         {
-                            this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                            this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + Border + (10 * nbBar) + HeightButton));
                             index += 15;
                             await Task.Delay(5);
                         }
@@ -612,7 +635,7 @@ namespace Sky_framework
                     {
                         for (int index = 0; index < SizeWidth;)
                         {
-                            this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                            this.Size = new Size(this.Width + 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + Border + (10 * nbBar) + HeightButton));
                             this.Location = new Point(this.Location.X - 15, this.Location.Y);
                             index += 15;
                             await Task.Delay(5);
@@ -647,7 +670,7 @@ namespace Sky_framework
                     }
                     else
                     {
-                        for (int index = (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn)); index > 0;)
+                        for (int index = (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + HeightButton); index > 0;)
                         {
                             this.Size = new Size(this.Width, this.Height - 15);
                             index -= 15;
@@ -669,7 +692,7 @@ namespace Sky_framework
                     }
                     else
                     {
-                        for (int index = (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn)); index > 0;)
+                        for (int index = (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + HeightButton); index > 0;)
                         {
                             this.Size = new Size(this.Width, this.Height - 15);
                             this.Location = new Point(this.Location.X, this.Location.Y + 15);
@@ -693,7 +716,7 @@ namespace Sky_framework
                     {
                         for (int index = this.Width; index > 0;)
                         {
-                            this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                            this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + HeightButton + Border + (10 * nbBar)));
                             index -= 15;
                             await Task.Delay(5);
                         }
@@ -715,7 +738,7 @@ namespace Sky_framework
                     {
                         for (int index = this.Width; index > 0;)
                         {
-                            this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + Border + (10 * nbBar)));
+                            this.Size = new Size(this.Width - 15, (HeightButton * arrondissement(ButtonsPage.Count() - buttons.Count(), TwoColumn) + HeightButton + Border + (10 * nbBar)));
                             this.Location = new Point(this.Location.X + 15, this.Location.Y);
                             index -= 15;
                             await Task.Delay(5);
@@ -734,9 +757,21 @@ namespace Sky_framework
             }
         }
 
-        private async void MainPage(object sender, MouseEventArgs e)
+        private void MainPage(object sender, MouseEventArgs e)
         {
-            if (ButtonsPage.Count() < this.Height)
+            MainPage();
+        }
+
+        public async void MainPage()
+        {
+            if (IsMainPage == true)
+            {
+                return;
+            }
+
+            IsMainPage = true;
+
+            if (ButtonsPage.Count() * HeightButton + HeightButton > this.Height - Border - (nbBar * 10))
             {
                 UpdateSizeMainPage(true);
             }

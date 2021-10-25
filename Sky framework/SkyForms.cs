@@ -1,11 +1,28 @@
-﻿using System;
+﻿/*--------------------------------------------------------------------------------------------------------------------
+ Copyright (C) 2021 Himber Sacha
+
+ This program is free software: you can redistribute it and/or modify
+ it under the +terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 2 of the License, or
+ any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see https://www.gnu.org/licenses/gpl-2.0.html. 
+
+--------------------------------------------------------------------------------------------------------------------*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
-using System.Runtime.InteropServices;
 
 namespace Sky_framework
 {
@@ -22,9 +39,12 @@ namespace Sky_framework
         private Color BorderColor_ = Color.FromArgb(64, 64, 64);
         private Color TextColor_ = Color.FromArgb(224, 224, 224);
         private bool ButtonMaximizedVisible_ = true;
+        private bool Redimensionnable_ = true;
+        private string TextCorrectSize = string.Empty;
+        private FormClosingEventHandler closing = null;
 
         public sbyte Border { get; set; } = 3;
-        public bool Redimensionnable { get; set; } = true;
+        new public FormClosingEventHandler FormClosing = null;
 
         public SkyForms() : base()
         {
@@ -40,7 +60,7 @@ namespace Sky_framework
             ButtonClose.Text = "x";
             ButtonClose.ForeColor = Color.FromArgb(224, 224, 224);
             ButtonClose.TextAlign = ContentAlignment.MiddleCenter;
-            ButtonClose.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point);
+            ButtonClose.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
             ButtonClose.MouseClick += new MouseEventHandler(ButtonCloseClique);
             this.Controls.Add(ButtonClose);
 
@@ -51,7 +71,7 @@ namespace Sky_framework
             ButtonMaximized.Text = "o";
             ButtonMinimized.ForeColor = Color.FromArgb(224, 224, 224);
             ButtonMaximized.TextAlign = ContentAlignment.MiddleCenter;
-            ButtonMaximized.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point);
+            ButtonMaximized.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
             ButtonMaximized.MouseClick += new MouseEventHandler(ButtonMaximizedClique);
             this.Controls.Add(ButtonMaximized);
 
@@ -62,11 +82,12 @@ namespace Sky_framework
             ButtonMinimized.Text = "-";
             ButtonMinimized.ForeColor = Color.FromArgb(224, 224, 224);
             ButtonMinimized.TextAlign = ContentAlignment.MiddleCenter;
-            ButtonMinimized.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point);
+            ButtonMinimized.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
             ButtonMinimized.MouseClick += new MouseEventHandler(ButtonMinimizedClique);
             this.Controls.Add(ButtonMinimized);
 
-            this.FormClosing += new FormClosingEventHandler(animationCloseForm);
+            closing += new FormClosingEventHandler(animationCloseForm);
+            base.FormClosing += closing;
             //this.MouseDown += new MouseEventHandler(This_MouseDown);
             //this.MaximumSize = Screen.FromHandle(Handle).Bounds.Size;
             this.SetStyle(ControlStyles.ResizeRedraw, true);
@@ -101,9 +122,12 @@ namespace Sky_framework
             this.WindowState = FormWindowState.Minimized;
         }
 
-        private void animationCloseForm(object sender, EventArgs e)
+        private void animationCloseForm(object sender, FormClosingEventArgs e)
         {
-            this.Close(false);
+            if (this.IsDisposed == false && this.Disposing == false && this.Opacity != 0)
+            {
+                this.Close(false, sender, e);
+            }
         }
 
         new public DialogResult ShowDialog()
@@ -136,8 +160,18 @@ namespace Sky_framework
             this.Opacity = 1;
         }
 
-        public void Close(bool ClearMemory)
+        public void Close(bool ClearMemory, object sender, FormClosingEventArgs e)
         {
+            if (FormClosing != null)
+            {
+                FormClosing(sender, e);
+
+                if (e.Cancel == true)
+                {
+                    return;
+                }
+            }
+
             while (this.Opacity >= 0.01)
             {
                 this.Opacity -= 0.05;
@@ -146,13 +180,14 @@ namespace Sky_framework
 
             if (ClearMemory == true)
             {
+                base.FormClosing -= closing;
                 base.Close();
             }
         }
 
         new public void Close()
-        {
-            Close(true);
+        {           
+            Close(true, new object(), new FormClosingEventArgs(CloseReason.UserClosing, false));
         }
 
         new public string Text
@@ -164,6 +199,7 @@ namespace Sky_framework
             set
             {
                 base.Text = value;
+
                 this.Refresh();
             }
         }
@@ -262,7 +298,14 @@ namespace Sky_framework
                 }
                 else
                 {
-                    this.FormBorderStyle = FormBorderStyle.Sizable;
+                    if (Redimensionnable_)
+                    {
+                        this.FormBorderStyle = FormBorderStyle.Sizable;
+                    }
+                    else
+                    {
+                        this.FormBorderStyle = FormBorderStyle.FixedSingle;
+                    }
                     this.WindowState = FormWindowState.Normal;
                     ButtonClose.Visible = true;
                     ButtonMaximized.Visible = ButtonMaximizedVisible_;
@@ -318,6 +361,27 @@ namespace Sky_framework
             }
         }
 
+        public bool Redimensionnable 
+        { 
+            get
+            {
+                return Redimensionnable_;
+            }
+            set
+            {
+                Redimensionnable_ = value;
+
+                if (Redimensionnable_ == true)
+                {
+                    this.FormBorderStyle = FormBorderStyle.Sizable;
+                }
+                else
+                {
+                    this.FormBorderStyle = FormBorderStyle.FixedSingle;
+                }
+            }
+        }
+
         /*protected override void OnResizeBegin(EventArgs e)
         {
             SuspendLayout();
@@ -337,8 +401,24 @@ namespace Sky_framework
 
                 System.Drawing.Rectangle rc = new System.Drawing.Rectangle(0, 0, this.ClientSize.Width, 20);
                 e.Graphics.FillRectangle(new SolidBrush(BorderColor_), rc);
-                e.Graphics.DrawString(this.Text, new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point), new SolidBrush(TextColor_), new Point(38, 0));
                 e.Graphics.DrawIcon(base.Icon, new System.Drawing.Rectangle(10, 2, 16, 16));
+
+                if (e.Graphics.MeasureString(this.Text, new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point)).Width > this.Width - 136)
+                {
+                    TextCorrectSize = this.Text;
+                    while (e.Graphics.MeasureString(TextCorrectSize, new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point)).Width >= this.Width - 136)
+                    {
+                        TextCorrectSize = TextCorrectSize.Remove(TextCorrectSize.Length - 1);
+                    }
+
+                    TextCorrectSize += "...";
+                    e.Graphics.DrawString(this.TextCorrectSize, new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point), new SolidBrush(TextColor_), new Point(38, 0));
+                }
+                else
+                {
+                    e.Graphics.DrawString(this.Text, new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point), new SolidBrush(TextColor_), new Point(38, 0));
+                }
+
 
                 /*IntPtr handle = Win32.CreateRoundRectRgn(0, 0, Width, Height, 15, 15);
 
@@ -348,8 +428,8 @@ namespace Sky_framework
                     Win32.DeleteObject(handle);
                 }*/
             }
-            else
-            {
+            //else
+            //{
                 /*IntPtr handle = Win32.CreateRoundRectRgn(0, 0, Width + 1, Height + 1, 0, 0);
 
                 if (handle != IntPtr.Zero)
@@ -359,7 +439,7 @@ namespace Sky_framework
                 }*/
 
                 //Sky_framework.Border.DrawRoundRectangle(new Pen(this.BackColor, Border), 0, 0, Width - 2, Height - 2, 5, e.Graphics);
-            }
+            //}
         }
 
         //
@@ -414,6 +494,33 @@ namespace Sky_framework
 
             base.WndProc(ref m);
         }
+
+        /*private bool OnSizeChanged_ = true;
+
+        protected async override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+            switch (this.WindowState)
+            {
+                case FormWindowState.Normal:
+                    if (OnSizeChanged_== false)
+                    {
+                        await Task.Delay(100);
+                        this.Size = new Size(this.Size.Width - 6, this.Size.Height - 13);
+                        OnSizeChanged_ = true;
+                    }
+
+                    break;
+
+                case FormWindowState.Maximized:
+                    OnSizeChanged_ = false;
+                    break;
+
+                case FormWindowState.Minimized:
+                    OnSizeChanged_ = false;
+                    break;
+            }
+        }*/
 
         /*protected override CreateParams CreateParams
         {

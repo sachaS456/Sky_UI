@@ -1,4 +1,22 @@
-﻿using System;
+﻿/*--------------------------------------------------------------------------------------------------------------------
+ Copyright (C) 2021 Himber Sacha
+
+ This program is free software: you can redistribute it and/or modify
+ it under the +terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 2 of the License, or
+ any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see https://www.gnu.org/licenses/gpl-2.0.html. 
+
+--------------------------------------------------------------------------------------------------------------------*/
+
+using System;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Threading.Tasks;
@@ -9,7 +27,7 @@ namespace Sky_framework
 
     public class Button : Control
     {
-        private ContentAlignment TextAling_ = ContentAlignment.MiddleCenter;
+        private ContentAlignment TextAlign_ = ContentAlignment.MiddleCenter;
         private Color Color;
         private bool Border_ = false;
         private bool MouseTouchButton = false;
@@ -35,6 +53,7 @@ namespace Sky_framework
             this.MouseClick += new MouseEventHandler(Button_MouseClick);
 
             Color = this.BackColor;
+            this.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold);
             SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.DoubleBuffer, true);
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             UpdateStyles();
@@ -68,7 +87,10 @@ namespace Sky_framework
                 ControlPaint.DrawBorder(CreateGraphics(), new System.Drawing.Rectangle(0, 0, this.Width, this.Height), BorderColor_, ButtonBorderStyle.Solid);
             }*/
 
-            DrawBorder(CreateGraphics());
+            if (this != null && this.IsDisposed == false && this.Disposing == false && this.CreateGraphics() != null)
+            {
+                DrawBorder(CreateGraphics());
+            }
         }
 
         public int borderRadius
@@ -98,7 +120,7 @@ namespace Sky_framework
                 return;
             }
 
-            SizeF sizeText = g.MeasureString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold));
+            SizeF sizeText = g.MeasureString(Text, this.Font);
             g.Clear(base.BackColor);
 
             if (Image_ != null)
@@ -106,18 +128,18 @@ namespace Sky_framework
                 DrawImage(g);
             }
 
-            switch (TextAling_)
+            switch (TextAlign_)
             {
                 case ContentAlignment.MiddleLeft:
-                    g.DrawString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold), new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(5, this.Height / 2 - (int)sizeText.Height / 2));
+                    g.DrawString(Text, this.Font, new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(5, this.Height / 2 - (int)sizeText.Height / 2));
                     break;
 
                 case ContentAlignment.MiddleCenter:
-                    g.DrawString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold), new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(this.Width / 2 - (int)sizeText.Width / 2, this.Height / 2 - (int)sizeText.Height / 2));
+                    g.DrawString(Text, this.Font, new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(this.Width / 2 - (int)sizeText.Width / 2, this.Height / 2 - (int)sizeText.Height / 2));
                     break;
 
                 case ContentAlignment.MiddleRight:
-                    g.DrawString(Text, new Font("Segoe UI", 9.75F, FontStyle.Bold), new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(this.Width - (int)sizeText.Width, this.Height / 2 - (int)sizeText.Height / 2));
+                    g.DrawString(Text, this.Font, new SolidBrush(Color.FromArgb(224, 224, 224)), new Point(this.Width - (int)sizeText.Width, this.Height / 2 - (int)sizeText.Height / 2));
                     break;
             }
 
@@ -651,7 +673,10 @@ namespace Sky_framework
             {
                 BorderSize_ = value;
 
-                DrawBorder(CreateGraphics());
+                if (this != null && this.IsDisposed == false && this.Disposing == false && this.CreateGraphics() != null)
+                {
+                    DrawBorder(CreateGraphics());
+                }
             }
         }
 
@@ -665,7 +690,10 @@ namespace Sky_framework
             {
                 BorderColor_ = value;
 
-                DrawBorder(CreateGraphics());
+                if (this != null && this.IsDisposed == false && this.Disposing == false && this.CreateGraphics() != null)
+                {
+                    DrawBorder(CreateGraphics());
+                }
             }
         }
 
@@ -679,7 +707,10 @@ namespace Sky_framework
             {
                 Border_ = value;
 
-                DrawBorder(CreateGraphics());
+                if (this != null && this.IsDisposed == false && this.Disposing == false && this.CreateGraphics() != null)
+                {
+                    DrawBorder(CreateGraphics());
+                }
             }            
         }
 
@@ -696,7 +727,10 @@ namespace Sky_framework
 
                 if (Border == true)
                 {
-                    ControlPaint.DrawBorder(CreateGraphics(), new System.Drawing.Rectangle(0, 0, this.Width, this.Height), BorderColor_, ButtonBorderStyle.Solid);
+                    if (this != null && this.IsDisposed == false && this.Disposing == false && this.CreateGraphics() != null)
+                    {
+                        ControlPaint.DrawBorder(CreateGraphics(), new System.Drawing.Rectangle(0, 0, this.Width, this.Height), BorderColor_, ButtonBorderStyle.Solid);
+                    }
                 }
             }
         }
@@ -717,12 +751,15 @@ namespace Sky_framework
         {
             get
             {
-                return TextAling_;
+                return TextAlign_;
             }
             set
             {
-                TextAling_ = value;
-                WriteText(CreateGraphics());
+                TextAlign_ = value;
+                if (this != null && this.IsDisposed == false && this.Disposing == false && this.CreateGraphics() != null)
+                {
+                    WriteText(CreateGraphics());
+                }
             }
         }
 
@@ -735,7 +772,10 @@ namespace Sky_framework
             set
             {
                 base.Text = value;
-                WriteText(CreateGraphics());
+                if (this != null && this.IsDisposed == false && this.Disposing == false && this.CreateGraphics() != null)
+                {
+                    WriteText(CreateGraphics());
+                }
             }
         }
 
@@ -748,7 +788,10 @@ namespace Sky_framework
             set
             {
                 ImageAlign_ = value;
-                DrawImage(CreateGraphics());
+                if (this != null && this.IsDisposed == false && this.Disposing == false && this.CreateGraphics() != null)
+                {
+                    DrawImage(CreateGraphics());
+                }
             }
         }
 
@@ -761,7 +804,10 @@ namespace Sky_framework
             set
             {
                 Image_ = value;
-                DrawImage(CreateGraphics());
+                if (this != null && this.IsDisposed == false && this.Disposing == false && this.CreateGraphics() != null)
+                {
+                    DrawImage(CreateGraphics());
+                }
             }
         }
 
