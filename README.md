@@ -1,2 +1,2 @@
-# Sky_framework
+# Sky framework
 Library of Sky Series
