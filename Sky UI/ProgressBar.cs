@@ -20,7 +20,7 @@ using System;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace Sky_framework
+namespace Sky_UI
 {
     public sealed class ProgressBar : Control
     {

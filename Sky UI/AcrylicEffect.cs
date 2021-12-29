@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace Sky_framework
+namespace Sky_UI
 {
     public static class AcrylicEffect
     {

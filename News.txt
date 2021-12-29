@@ -1,0 +1,10 @@
+﻿Changes between 3.0.0 and 3.0.1:
+----------------------------------
+
+-Fixed an issue where windows would get bigger when restoring them from minimized and maximized mode
+-Fixed an issue where windows were displayed incorrectly in maximized mode
+-Fixed an issue where the animation of ShowDialog () did not work incorrectly or at all
+-Fixed button animations
+-Small performance improvement
+
+----------------------------------

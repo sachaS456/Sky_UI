@@ -24,24 +24,24 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace Sky_framework
+namespace Sky_UI
 {
     public class SkyForms : Form
     {
-        private ReSize resize = new ReSize();
-        //private Rectangle ControlBar = new Rectangle();
-        //private Label label = new Label();
-        //private PictureBox PictureBox = new PictureBox();
+        private readonly ReSize resize = new ReSize();
         private bool FullSreen_ = false;
-        private ButtonCircular ButtonClose = new ButtonCircular();
-        private ButtonCircular ButtonMaximized = new ButtonCircular();
-        private ButtonCircular ButtonMinimized = new ButtonCircular();
+        private readonly ButtonCircular ButtonClose = new ButtonCircular();
+        private readonly ButtonCircular ButtonMaximized = new ButtonCircular();
+        private readonly ButtonCircular ButtonMinimized = new ButtonCircular();
         private Color BorderColor_ = Color.FromArgb(64, 64, 64);
         private Color TextColor_ = Color.FromArgb(224, 224, 224);
         private bool ButtonMaximizedVisible_ = true;
         private bool Redimensionnable_ = true;
         private string TextCorrectSize = string.Empty;
         private FormClosingEventHandler closing = null;
+        private Size formSize;
+        private readonly System.Drawing.Rectangle MaximizedBoundsDefaultValue;
+        private bool PlacedButton = false;
 
         public sbyte Border { get; set; } = 3;
         new public FormClosingEventHandler FormClosing = null;
@@ -52,6 +52,8 @@ namespace Sky_framework
             this.MinimumSize = new Size(200, 100);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = "Sky Form";
+            MaximizedBoundsDefaultValue = this.MaximizedBounds;
+            this.MaximizedBounds = new System.Drawing.Rectangle(0, 0, Screen.GetWorkingArea(this).Width - 1, Screen.GetWorkingArea(this).Height - 1);
 
             ButtonClose.Size = 20;
             ButtonClose.BackColor = Color.FromArgb(245, 90, 90);
@@ -88,17 +90,11 @@ namespace Sky_framework
 
             closing += new FormClosingEventHandler(animationCloseForm);
             base.FormClosing += closing;
-            //this.MouseDown += new MouseEventHandler(This_MouseDown);
             //this.MaximumSize = Screen.FromHandle(Handle).Bounds.Size;
             this.SetStyle(ControlStyles.ResizeRedraw, true);
             this.SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             this.UpdateStyles();
         }
-
-        /*private void This_MouseDown(object sender, MouseEventArgs e)
-        {
-
-        }*/
 
         private void ButtonCloseClique(object sender, MouseEventArgs e)
         {
@@ -138,7 +134,8 @@ namespace Sky_framework
             while (this.Opacity <= 0.99)
             {
                 this.Opacity += 0.05;
-                System.Threading.Thread.Sleep(1000 / 60);
+                System.Threading.Thread.Sleep(17);
+                this.Update();
             }
 
             this.Visible = false;
@@ -154,7 +151,7 @@ namespace Sky_framework
             while (this.Opacity <= 0.99)
             {
                 this.Opacity += 0.05;
-                await Task.Delay(1000 / 60);
+                await Task.Delay(17);
             }
 
             this.Opacity = 1;
@@ -175,7 +172,7 @@ namespace Sky_framework
             while (this.Opacity >= 0.01)
             {
                 this.Opacity -= 0.05;
-                System.Threading.Thread.Sleep(1000/60);
+                System.Threading.Thread.Sleep(17);
             }
 
             if (ClearMemory == true)
@@ -291,6 +288,7 @@ namespace Sky_framework
                 {
                     this.WindowState = FormWindowState.Normal;
                     this.FormBorderStyle = FormBorderStyle.None;
+                    this.MaximizedBounds = MaximizedBoundsDefaultValue;
                     this.WindowState = FormWindowState.Maximized;
                     ButtonClose.Visible = false;
                     ButtonMaximized.Visible = false;
@@ -306,7 +304,9 @@ namespace Sky_framework
                     {
                         this.FormBorderStyle = FormBorderStyle.FixedSingle;
                     }
+                    this.MaximizedBounds = new System.Drawing.Rectangle(0, 0, Screen.GetWorkingArea(this).Width - 1, Screen.GetWorkingArea(this).Height - 1);
                     this.WindowState = FormWindowState.Normal;
+
                     ButtonClose.Visible = true;
                     ButtonMaximized.Visible = ButtonMaximizedVisible_;
                     ButtonMinimized.Visible = true;
@@ -326,9 +326,13 @@ namespace Sky_framework
             {
                 base.Size = value;
 
-                ButtonClose.Location = new Point(this.Width - 36, ButtonClose.Location.Y);
-                ButtonMaximized.Location = new Point(this.Width - 62, ButtonMaximized.Location.Y);
-                ButtonMinimized.Location = new Point(this.Width - 88, ButtonMinimized.Location.Y);
+                if (PlacedButton == false)
+                {
+                    ButtonClose.Location = new Point(this.Width - 36, ButtonClose.Location.Y);
+                    ButtonMaximized.Location = new Point(this.Width - 62, ButtonMaximized.Location.Y);
+                    ButtonMinimized.Location = new Point(this.Width - 88, ButtonMinimized.Location.Y);
+                    PlacedButton = true;
+                }
             }
         }
 
@@ -342,9 +346,36 @@ namespace Sky_framework
             {
                 base.ClientSize = value;
 
-                ButtonClose.Location = new Point(this.Width - 36, ButtonClose.Location.Y);
-                ButtonMaximized.Location = new Point(this.Width - 62, ButtonMaximized.Location.Y);
-                ButtonMinimized.Location = new Point(this.Width - 88, ButtonMinimized.Location.Y);
+                if (PlacedButton == false)
+                {
+                    ButtonClose.Location = new Point(this.Width - 36, ButtonClose.Location.Y);
+                    ButtonMaximized.Location = new Point(this.Width - 62, ButtonMaximized.Location.Y);
+                    ButtonMinimized.Location = new Point(this.Width - 88, ButtonMinimized.Location.Y);
+                    PlacedButton = true;
+                }
+            }
+        }
+
+        new public FormWindowState WindowState
+        {
+            get
+            {
+                return base.WindowState;
+            }
+            set
+            {
+                switch (value)
+                {
+                    case FormWindowState.Normal:
+                        base.WindowState = value;
+                        this.Size = formSize;
+                        break;
+
+                    default:
+                        formSize = this.ClientSize;
+                        base.WindowState = value;
+                        break;
+                }
             }
         }
 
@@ -382,22 +413,21 @@ namespace Sky_framework
             }
         }
 
-        /*protected override void OnResizeBegin(EventArgs e)
+        protected override void OnMove(EventArgs e)
         {
-            SuspendLayout();
-            base.OnResizeBegin(e);
+            if (FullSreen_ == false)
+            {
+                this.MaximizedBounds = new System.Drawing.Rectangle(0, 0, Screen.GetWorkingArea(this).Width - 1, Screen.GetWorkingArea(this).Height - 1);
+            }
+
+            base.OnMove(e);
         }
-        protected override void OnResizeEnd(EventArgs e)
-        {
-            ResumeLayout();
-            base.OnResizeEnd(e);
-        }*/
 
         protected override void OnPaint(PaintEventArgs e)
         {
             if (FullSreen_ == false)
             {
-                Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor_, Border), 0, 0, Width - 2, Height - 2, 2, e.Graphics);
+                Sky_UI.Border.DrawRoundRectangle(new Pen(BorderColor_, Border), 0, 0, Width - 2, Height - 2, 2, e.Graphics);
 
                 System.Drawing.Rectangle rc = new System.Drawing.Rectangle(0, 0, this.ClientSize.Width, 20);
                 e.Graphics.FillRectangle(new SolidBrush(BorderColor_), rc);
@@ -418,28 +448,7 @@ namespace Sky_framework
                 {
                     e.Graphics.DrawString(this.Text, new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point), new SolidBrush(TextColor_), new Point(38, 0));
                 }
-
-
-                /*IntPtr handle = Win32.CreateRoundRectRgn(0, 0, Width, Height, 15, 15);
-
-                if (handle != IntPtr.Zero)
-                {
-                    //Region = Region.FromHrgn(handle);
-                    Win32.DeleteObject(handle);
-                }*/
             }
-            //else
-            //{
-                /*IntPtr handle = Win32.CreateRoundRectRgn(0, 0, Width + 1, Height + 1, 0, 0);
-
-                if (handle != IntPtr.Zero)
-                {
-                    //Region = Region.FromHrgn(handle);
-                    Win32.DeleteObject(handle);
-                }*/
-
-                //Sky_framework.Border.DrawRoundRectangle(new Pen(this.BackColor, Border), 0, 0, Width - 2, Height - 2, 5, e.Graphics);
-            //}
         }
 
         //
@@ -485,51 +494,26 @@ namespace Sky_framework
                 return;
             }
 
-            /*const int WM_NCCALCSIZE = 0x83;
-            if (m.Msg == WM_NCCALCSIZE && m.WParam.ToInt32() == 1)
+            const int SC_MINIMIZE = 0xF020; //Minimize form (Before)
+            const int SC_RESTORE = 0xF120; //Restore form (Before)
+
+            //Keep form size when it is minimized and restored. Since the form is resized because it takes into account the size of the title bar and borders.
+            if (m.Msg == 0x0112)
             {
-                m.Result = new IntPtr(0xF0);   // Align client area to all borders
-                return;
-            }*/
+                int wParam = (m.WParam.ToInt32() & 0xFFF0);
+
+                if (wParam == SC_MINIMIZE)  //Before
+                {
+                    formSize = this.ClientSize;
+                }
+
+                if (wParam == SC_RESTORE)// Restored form(Before)
+                {
+                    this.Size = formSize;
+                }
+            }
 
             base.WndProc(ref m);
         }
-
-        /*private bool OnSizeChanged_ = true;
-
-        protected async override void OnSizeChanged(EventArgs e)
-        {
-            base.OnSizeChanged(e);
-            switch (this.WindowState)
-            {
-                case FormWindowState.Normal:
-                    if (OnSizeChanged_== false)
-                    {
-                        await Task.Delay(100);
-                        this.Size = new Size(this.Size.Width - 6, this.Size.Height - 13);
-                        OnSizeChanged_ = true;
-                    }
-
-                    break;
-
-                case FormWindowState.Maximized:
-                    OnSizeChanged_ = false;
-                    break;
-
-                case FormWindowState.Minimized:
-                    OnSizeChanged_ = false;
-                    break;
-            }
-        }*/
-
-        /*protected override CreateParams CreateParams
-        {
-            get
-            {
-                CreateParams cp = base.CreateParams;
-                cp.Style |= 0x20000 | 0x80000 | 0x40000; //WS_MINIMIZEBOX | WS_SYSMENU | WS_SIZEBOX;
-                return cp;
-            }
-        }*/
     }
 }

@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Sky_framework
+namespace Sky_UI
 {
     public sealed class ButtonCircular : Button
     {

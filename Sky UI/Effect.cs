@@ -25,7 +25,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
 
-namespace Sky_framework
+namespace Sky_UI
 {
     public static class Effect
     {

@@ -21,7 +21,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Threading.Tasks;
 
-namespace Sky_framework
+namespace Sky_UI
 {
     public delegate void MouseEventNameHandler(string Text, int ID, MouseEventArgs e);
 
@@ -149,9 +149,20 @@ namespace Sky_framework
         private async void Button_MouseEnter(object sender, EventArgs e)
         {
             MouseTouchButton = true;
-            if (this.BackColor.R + 40 > 255 && this.BackColor.G + 40 > 255 && this.BackColor.B + 40 > 255)
+
+            while (base.BackColor.R != Color.R && base.BackColor.G != Color.G && base.BackColor.B != Color.B)
             {
-                for (int index = 0; index <= 20; index += 2)
+                await Task.Delay(100);
+            }
+
+            if (MouseTouchButton == false)
+            {
+                return;
+            }
+
+            if (base.BackColor.R + 40 > 255 && base.BackColor.G + 40 > 255 && base.BackColor.B + 40 > 255)
+            {
+                for (sbyte index = 0; index <= 20; index += 2)
                 {
                     if (Color.R + index >= 255 && Color.G + index >= 255 && Color.B + index >= 255)
                     {
@@ -203,7 +214,7 @@ namespace Sky_framework
             {
                 if (Color.G + 40 > 255)
                 {
-                    for (int index = 0; index <= 20; index += 2)
+                    for (sbyte index = 0; index <= 20; index += 2)
                     {
                         if (Color.R + index >= 255 && Color.G + index >= 255)
                         {
@@ -229,7 +240,7 @@ namespace Sky_framework
                 }
                 else if (Color.B + 40 > 255)
                 {
-                    for (int index = 0; index <= 20; index += 2)
+                    for (sbyte index = 0; index <= 20; index += 2)
                     {
                         if (Color.R + index >= 255 && Color.B + index >= 255)
                         {
@@ -255,7 +266,7 @@ namespace Sky_framework
                 }
                 else
                 {
-                    for (int index = 0; index <= 20; index += 2)
+                    for (sbyte index = 0; index <= 20; index += 2)
                     {
                         if (Color.R + index >= 255)
                         {
@@ -276,7 +287,7 @@ namespace Sky_framework
             {
                 if (Color.B + 40 > 255)
                 {
-                    for (int index = 0; index <= 20; index += 2)
+                    for (sbyte index = 0; index <= 20; index += 2)
                     {
                         if (Color.G + index >= 255 && Color.B + index >= 255)
                         {
@@ -302,7 +313,7 @@ namespace Sky_framework
                 }
                 else
                 {
-                    for (int index = 0; index <= 20; index += 2)
+                    for (sbyte index = 0; index <= 20; index += 2)
                     {
                         if (Color.G + index >= 255)
                         {
@@ -321,7 +332,7 @@ namespace Sky_framework
             }
             else if (this.BackColor.B + 40 > 255) // B
             {
-                for (int index = 0; index <= 20; index += 2)
+                for (sbyte index = 0; index <= 20; index += 2)
                 {
                     if (Color.B + index >= 255)
                     {
@@ -339,7 +350,7 @@ namespace Sky_framework
             }
             else
             {
-                for (int index = 0; index <= 20; index += 2)
+                for (sbyte index = 0; index <= 20; index += 2)
                 {
                     base.BackColor = Color.FromArgb(Color.R + index, Color.G + index, Color.B + index);
 
@@ -359,9 +370,14 @@ namespace Sky_framework
                 await Task.Delay(100);
             }
 
+            if (MouseTouchButton == true)
+            {
+                return;
+            }
+
             if (base.BackColor.R - 40 != Color.R && base.BackColor.G - 40 != Color.G && base.BackColor.B - 40 != Color.B)
             {
-                for (int index = 20; index >= 0; index -= 2)
+                for (sbyte index = 20; index >= 0; index -= 2)
                 {
                     if (255 - Color.R <= index && 255 - Color.G <= index && 255 - Color.B <= index)
                     {
@@ -404,10 +420,10 @@ namespace Sky_framework
 
                     await Task.Delay(10);
 
-                    if (MouseTouchButton == true)
+                    /*if (MouseTouchButton == true)
                     {
                         return;
-                    }
+                    }*/
                 }
 
                 base.BackColor = Color;
@@ -418,7 +434,7 @@ namespace Sky_framework
             {
                 if (base.BackColor.G - 40 != Color.G)
                 {
-                    for (int index = 20; index >= 0; index -= 2)
+                    for (sbyte index = 20; index >= 0; index -= 2)
                     {
                         if (255 - Color.R <= index && 255 - Color.G <= index)
                         {
@@ -439,15 +455,15 @@ namespace Sky_framework
 
                         await Task.Delay(10);
 
-                        if (MouseTouchButton == true)
+                        /*if (MouseTouchButton == true)
                         {
                             return;
-                        }
+                        }*/
                     }
                 }
                 else if (base.BackColor.B - 40 != Color.B)
                 {
-                    for (int index = 20; index >= 0; index -= 2)
+                    for (sbyte index = 20; index >= 0; index -= 2)
                     {
                         if (255 - Color.R <= index && 255 - Color.B <= index)
                         {
@@ -468,15 +484,15 @@ namespace Sky_framework
 
                         await Task.Delay(10);
 
-                        if (MouseTouchButton == true)
+                        /*if (MouseTouchButton == true)
                         {
                             return;
-                        }
+                        }*/
                     }
                 }
                 else
                 {
-                    for (int index = 20; index >= 0; index -= 2)
+                    for (sbyte index = 20; index >= 0; index -= 2)
                     {
                         if (255 - Color.R <= index)
                         {
@@ -489,10 +505,10 @@ namespace Sky_framework
 
                         await Task.Delay(10);
 
-                        if (MouseTouchButton == true)
+                        /*if (MouseTouchButton == true)
                         {
                             return;
-                        }
+                        }*/
                     }
                 }
             }
@@ -500,7 +516,7 @@ namespace Sky_framework
             {
                 if (base.BackColor.B - 40 != Color.B)
                 {
-                    for (int index = 20; index >= 0; index -= 2)
+                    for (sbyte index = 20; index >= 0; index -= 2)
                     {
                         if (255 - Color.G <= index && 255 - Color.B <= index)
                         {
@@ -521,15 +537,15 @@ namespace Sky_framework
 
                         await Task.Delay(10);
 
-                        if (MouseTouchButton == true)
+                        /*if (MouseTouchButton == true)
                         {
                             return;
-                        }
+                        }*/
                     }
                 }
                 else
                 {
-                    for (int index = 20; index >= 0; index -= 2)
+                    for (sbyte index = 20; index >= 0; index -= 2)
                     {
                         if (255 - Color.G <= index)
                         {
@@ -542,16 +558,16 @@ namespace Sky_framework
 
                         await Task.Delay(10);
 
-                        if (MouseTouchButton == true)
+                        /*if (MouseTouchButton == true)
                         {
                             return;
-                        }
+                        }*/
                     }
                 }
             }
             else if (base.BackColor.B - 40 != Color.B) // B
             {
-                for (int index = 20; index >= 0; index -= 2)
+                for (sbyte index = 20; index >= 0; index -= 2)
                 {
                     if (255 - Color.R <= index)
                     {
@@ -564,24 +580,24 @@ namespace Sky_framework
 
                     await Task.Delay(10);
 
-                    if (MouseTouchButton == true)
+                    /*if (MouseTouchButton == true)
                     {
                         return;
-                    }
+                    }*/
                 }
             }
             else
             {
-                for (int index = 20; index >= 0; index -= 2)
+                for (sbyte index = 20; index >= 0; index -= 2)
                 {
                     base.BackColor = Color.FromArgb(Color.R + index, Color.G + index, Color.B + index);
 
                     await Task.Delay(10);
 
-                    if (MouseTouchButton == true)
+                    /*if (MouseTouchButton == true)
                     {
                         return;
-                    }
+                    }*/
                 }
             }
 
@@ -659,7 +675,7 @@ namespace Sky_framework
             if (Border == true)
             {
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor_, BorderSize_), 0, 0, Width - BorderSize_, Height - BorderSize_, borderRadius - 7, g);
+                Sky_UI.Border.DrawRoundRectangle(new Pen(BorderColor_, BorderSize_), 0, 0, Width - BorderSize_, Height - BorderSize_, borderRadius - 7, g);
             }
         }
 

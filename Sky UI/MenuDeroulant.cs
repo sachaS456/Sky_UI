@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace Sky_framework
+namespace Sky_UI
 {
     public sealed class MenuDeroulant : Control
     {
@@ -86,11 +86,11 @@ namespace Sky_framework
 
             if (Border != 0)
             {
-                Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor, Border), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+                Sky_UI.Border.DrawRoundRectangle(new Pen(BorderColor, Border), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
             }
             else
             {
-                Sky_framework.Border.DrawRoundRectangle(new Pen(this.BackColor, 1), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+                Sky_UI.Border.DrawRoundRectangle(new Pen(this.BackColor, 1), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
             }
             //ControlPaint.DrawBorder(CreateGraphics(), this.ClientRectangle, BorderColor, Border, ButtonBorderStyle.Solid, BorderColor, Border, ButtonBorderStyle.Solid,
             //BorderColor, Border, ButtonBorderStyle.Solid, BorderColor, Border, ButtonBorderStyle.Solid);
@@ -646,11 +646,11 @@ namespace Sky_framework
 
             if (Border != 0)
             {
-                Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor, Border), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+                Sky_UI.Border.DrawRoundRectangle(new Pen(BorderColor, Border), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
             }
             else
             {
-                Sky_framework.Border.DrawRoundRectangle(new Pen(this.BackColor, 1), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+                Sky_UI.Border.DrawRoundRectangle(new Pen(this.BackColor, 1), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
             }
         }
 
@@ -749,11 +749,11 @@ namespace Sky_framework
 
             if (Border != 0)
             {
-                Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor, Border), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+                Sky_UI.Border.DrawRoundRectangle(new Pen(BorderColor, Border), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
             }
             else
             {
-                Sky_framework.Border.DrawRoundRectangle(new Pen(this.BackColor, 1), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+                Sky_UI.Border.DrawRoundRectangle(new Pen(this.BackColor, 1), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
             }
         }
 
@@ -1039,11 +1039,11 @@ namespace Sky_framework
             //BorderColor, Border, ButtonBorderStyle.Solid, BorderColor, Border, ButtonBorderStyle.Solid);
             if (Border != 0)
             {
-                Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor, Border), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+                Sky_UI.Border.DrawRoundRectangle(new Pen(BorderColor, Border), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
             }
             else
             {
-                Sky_framework.Border.DrawRoundRectangle(new Pen(this.BackColor, 1), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
+                Sky_UI.Border.DrawRoundRectangle(new Pen(this.BackColor, 1), 0, 0, Width - 1, Height - 1, BorderRadius_, this.CreateGraphics());
             }
         }
 

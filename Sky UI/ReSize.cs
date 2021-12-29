@@ -19,7 +19,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Sky_framework
+namespace Sky_UI
 {
     internal sealed class ReSize
     {
@@ -27,8 +27,8 @@ namespace Sky_framework
         private bool Above, Right, Under, Left, Right_above, Right_under, Left_under, Left_above;
 
 
-        private int Thickness = 6;  //Thickness of border  u can cheang it
-        private int Area = 8;     //Thickness of Angle border 
+        private readonly int Thickness;  //Thickness of border
+        private const int Area = 8;     //Thickness of Angle border 
 
 
         /// <summary>

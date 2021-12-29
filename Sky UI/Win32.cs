@@ -19,7 +19,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Sky_framework
+namespace Sky_UI
 {
     public static class Win32
     {

@@ -25,7 +25,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace Sky_framework
+namespace Sky_UI
 {
     public static class Border
     {

@@ -20,7 +20,7 @@ using System;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace Sky_framework
+namespace Sky_UI
 {
     public class Rectangle : ScrollableControl
     {
@@ -74,7 +74,7 @@ namespace Sky_framework
             
             if (Border == true)
             {
-                Sky_framework.Border.DrawRoundRectangle(new Pen(BorderColor, BorderWidth), 0, 0, Width - 2, Height - 2, BorderRadius, this.CreateGraphics());
+                Sky_UI.Border.DrawRoundRectangle(new Pen(BorderColor, BorderWidth), 0, 0, Width - 2, Height - 2, BorderRadius, this.CreateGraphics());
             }
         }
 
