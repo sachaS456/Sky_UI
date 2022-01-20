@@ -1,4 +1,12 @@
-﻿Changes between 3.0.0 and 3.0.1:
+﻿
+Changes between 3.0.1 and 3.0.2:
+----------------------------------
+
+-GPL 2 license upgrade to GPL 3 
+-.Net 5 upgrade to .Net 6
+
+----------------------------------
+Changes between 3.0.0 and 3.0.1:
 ----------------------------------
 
 -Fixed an issue where windows would get bigger when restoring them from minimized and maximized mode
