@@ -1,4 +1,10 @@
 ﻿
+Changes between 3.0.2 and 3.0.3:
+----------------------------------
+
+-fixed an unhandled exception that could occur when animating a button
+
+----------------------------------
 Changes between 3.0.1 and 3.0.2:
 ----------------------------------
 

@@ -569,9 +569,9 @@ namespace Sky_UI
             {
                 for (sbyte index = 20; index >= 0; index -= 2)
                 {
-                    if (255 - Color.R <= index)
+                    if (255 - Color.B <= index)
                     {
-                        base.BackColor = Color.FromArgb(base.BackColor.R, Color.G + index, Color.B + index);
+                        base.BackColor = Color.FromArgb(Color.R, Color.G + index, base.BackColor.B);
                     }
                     else
                     {
