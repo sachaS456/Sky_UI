@@ -30,7 +30,7 @@ namespace Sky_UI
         private int Value = 0;
         private int ValuePourcentage = 0;
         private int BorderRadius_ = 0;
-        private const int bordure = -2;
+        private const int borderW = 2;
         private MouseEventHandler MouseClick_ = null;
         private MouseEventHandler MouseMove_ = null;
         private MouseEventHandler MouseUp_ = null;
@@ -39,8 +39,8 @@ namespace Sky_UI
         public ProgressBar()
         {
             Rectangle.BackColor = Color.Orange;
-            Rectangle.Size = new Size(this.Width + bordure, this.Height + bordure);
-            Rectangle.Location = new Point(bordure / -2, bordure / -2);
+            Rectangle.Size = new Size(this.Width - borderW * 2, this.Height - borderW * 2);
+            Rectangle.Location = new Point(borderW, borderW);
             Rectangle.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom;
             Rectangle.Resize += new EventHandler(This_Resize);
             this.Controls.Add(Rectangle);
@@ -53,10 +53,10 @@ namespace Sky_UI
 
         private void This_Resize(object sender, EventArgs e)
         {
-            BorderUpddate();
+            BorderUpdate();
         }
 
-        private void BorderUpddate()
+        private void BorderUpdate()
         {
             if (BorderRadius == 0)
             {
@@ -72,14 +72,6 @@ namespace Sky_UI
                     Region = Region.FromHrgn(handle);
                     Win32.DeleteObject(handle);
                 }
-
-                IntPtr handle2 = Win32.CreateRoundRectRgn(0, 0, Rectangle.Width, Rectangle.Height, BorderRadius, BorderRadius);
-
-                if (handle2 != IntPtr.Zero)
-                {
-                    Rectangle.Region = Region.FromHrgn(handle2);
-                    Win32.DeleteObject(handle2);
-                }
             }
         }
 
@@ -92,7 +84,17 @@ namespace Sky_UI
             set
             {
                 BorderRadius_ = value;
-                BorderUpddate();
+
+                if (value - 1 >= 0)
+                {
+                    Rectangle.BorderRadius = value - 1;
+                }
+                else
+                {
+                    Rectangle.BorderRadius = 0;
+                }
+
+                BorderUpdate();
             }
         }
 
@@ -116,7 +118,7 @@ namespace Sky_UI
             }
             set
             {
-                Value = (int)((double)value / 100 * (this.Width - bordure));
+                Value = (int)((float)value / 100 * (this.Width - borderW * 2));
                 Rectangle.Width = Value;
                 ValuePourcentage = value;
                 this.Resize += new EventHandler(this.ProgressBar_Resize);
@@ -125,16 +127,16 @@ namespace Sky_UI
 
         public void SetValuePixels(int value)
         {
-            if (value <= this.Width - bordure)
+            if (value <= this.Width - borderW * 2)
             {
                 Value = value;
                 Rectangle.Width = value;
-                ValuePourcentage = (int)((double)value * 100 / this.Width);
+                ValuePourcentage = (int)((float)value * 100 / this.Width - borderW * 2);
             }
             else
             {
-                Value = this.Width - bordure;
-                Rectangle.Width = this.Width - bordure;
+                Value = this.Width + borderW;
+                Rectangle.Width = this.Width - borderW * 2;
             }
 
             this.Resize -= new EventHandler(this.ProgressBar_Resize);
@@ -203,7 +205,7 @@ namespace Sky_UI
 
         private void ProgressBar_Resize(object sender, EventArgs e)
         {
-            Rectangle.Width = Value / 100 * this.Width + bordure;
+            Rectangle.Width = (int)((float)Value / 100 * this.Width - borderW * 2);
         }
     }
 }
